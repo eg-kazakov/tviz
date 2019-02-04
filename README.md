@@ -19,6 +19,7 @@ GPS trips/traces visual editor
 - Separate layers for each device (probe) *(1)*
 - Show/hide layers on map *(1)*
 - Show full point/segment row content for selected points/segments with header in popup *(1)*
+- Selected rows content filtering
 - Add new GPS layer *(2)*
 - Delete layer *(2)*
 
