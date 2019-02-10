@@ -20,7 +20,7 @@
 
     class ColorRotator {
         __index: number = 0;
-        static __colorWheel: string[] = ['#ffe600', '#b3ff00', '#ffa600', '#04ffe2', '#0421ff', '#11ff04'];
+        static __colorWheel: string[] = ['#ffe600', '#04ffe2', '#b3ff00', '#0421ff', '#ffa600', '#11ff04'];
         nextColor(): string {
             if (this.__index >= ColorRotator.__colorWheel.length) {
                 this.__index = 0;
@@ -40,6 +40,8 @@
             if(!fileInput.files) return;
 
             const file = fileInput.files[0];
+            if (this.layers.some(l => l === file.name)) return;
+
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
             csvFileParse(file, {
@@ -51,7 +53,7 @@
                 // }
                 complete: results => {
                     console.log('Finished:', results.data);
-                    if(!this.map || this.layers.length != 0) return;
+                    if(!this.map) return;
 
                     const headersSet = new Set(results.meta.fields);
                     if (!headersSet.has('lat') || !headersSet.has('lat')) {
@@ -75,8 +77,8 @@
                         const markers: CircleMarker[] =  [];
                         const colorer = new ColorRotator();
                         for(const [segmentId, coords] of segments.entries()){
-                            lines.push(polyline(coords));
                             const color = colorer.nextColor();
+                            lines.push(polyline(coords, {color}));
                             for (const coord of coords){
                                 markers.push(this.__createCircleMarker(coord, color));
                             }
