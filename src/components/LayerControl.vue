@@ -7,7 +7,7 @@
             class="layer-control-button"
             @click="fitMap"
         >
-            &#10538;&#10536;
+            &#10536;&#10538;
         </button>
         <button
             class="layer-control-button"

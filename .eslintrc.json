@@ -1,10 +1,12 @@
 {
   "extends": [
-    "plugin:vue/recommended"
+    "plugin:vue/recommended",
+    "eslint:recommended",
+    "@vue/typescript"
   ],
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
-    "ecmaVersion": 2018,
+    "ecmaVersion": 2017,
     "ecmaFeatures": {
       "jsx": true,
       "modules": true

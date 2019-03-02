@@ -15,13 +15,13 @@
 <script lang="ts">
     import {map as lMap, Map as Lmap, tileLayer} from 'leaflet';
     import Vue from 'vue';
-    import {parse as csvFileParse} from 'papaparse';
     import {Component} from 'vue-property-decorator';
     import LayerControl from './components/LayerControl';
     import {TrajectorySegment} from "./TrajectorySegment";
     import {SegmentsMapLayer} from "./SegmentsMapLayer";
     import {GPSMapLayer} from "./GPSMapLayer";
     import {MapLayerBase} from "./MapLayerBase";
+    import {loadCsv, CsvData} from './csvLoader';
 
     @Component ({components: {LayerControl}})
     export default class App extends Vue {
@@ -34,31 +34,25 @@
             if(!fileInput.files) return;
 
             const file = fileInput.files[0];
-            fileInput.files = null;
             if (this.layers.some(l => l.sourceName === file.name)) return;
 
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
-            csvFileParse(file, {
-                header: true,
-                skipEmptyLines: true,
-                // worker: true,
-                // step(results) {
-                //     console.log("Row:", results.data);
-                // }
-                complete: results => {
-                    console.log('Finished:', results.data);
+            loadCsv(file)
+                .then((csvResult: CsvData) => {
+                    console.log('Loaded:', csvResult.data.length);
+
                     if(!this.map) return;
 
-                    const headersSet = new Set(results.meta.fields);
+                    const headersSet = new Set(csvResult.fields);
                     if (!headersSet.has('lat') || !headersSet.has('lat')) {
-                        console.error(`Unsupported format: ${results.meta.fields.join(', ')}`);
+                        console.error(`Unsupported format: ${csvResult.fields.join(', ')}`);
                         return;
                     }
 
                     if (headersSet.has('segment_id')) {
                         console.log('Segments mode');
-                        const segments: TrajectorySegment[] = results.data.reduce(
+                        const segments: TrajectorySegment[] = csvResult.data.reduce(
                             (acc: TrajectorySegment[], row) => {
                                 const latLng = {lat: parseFloat(row.lat), lng: parseFloat(row.lon)};
                                 if (acc.length < 1 || acc[acc.length - 1].segmentId != row.segment_id) {
@@ -71,18 +65,15 @@
                         this.layers.push(new SegmentsMapLayer(file.name, segments, this.map));
                     } else {
                         console.log('GPS mode');
-                        const coords = results.data.map(row => ({
+                        const coords = csvResult.data.map(row => ({
                             lat: parseFloat(row.lat),
                             lng: parseFloat(row.lon)
                         }));
                         this.layers.push(new GPSMapLayer(file.name, coords, this.map));
                     }
-                    this.isInProgress = false;
-                },
-                error: () => {
-                    this.isInProgress = false;
-                },
-            });
+                })
+                .catch(err => console.error(err))
+                .finally(() => this.isInProgress = false);
         }
 
         mounted() {
