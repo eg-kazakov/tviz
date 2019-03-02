@@ -1,8 +1,13 @@
 <template>
-    <div class="layer-control">
+    <div
+        class="layer-control"
+        :class="{active}"
+        @click="setActive"
+    >
         <input
             v-model="isVisible"
             type="checkbox"
+            @click.stop=""
         >
         <div
             class="layer-control-name"
@@ -12,13 +17,13 @@
         </div>
         <button
             class="layer-control-button"
-            @click="fitMap"
+            @click.stop="fitMap"
         >
             &#10536;&#10538;
         </button>
         <button
             class="layer-control-button"
-            @click="removeLayer"
+            @click.stop="removeLayer"
         >
             &#10062;
         </button>
@@ -27,13 +32,16 @@
 
 <script lang="ts">
     import Vue from 'vue';
-    import {Component, Prop} from 'vue-property-decorator';
+    import {Component, Prop, Watch} from 'vue-property-decorator';
     import {MapLayerBase} from '../mapLayers/MapLayerBase';
 
     @Component
     export default class LayerControl extends Vue {
         @Prop()
         readonly mapLayer!: MapLayerBase;
+
+        @Prop()
+        readonly active!: boolean;
 
         get name(): String {
             return this.mapLayer.fullTitle;
@@ -56,8 +64,17 @@
             this.mapLayer.fitMap();
         }
 
+        setActive() {
+            this.$parent.$emit('set-active-layer', this.mapLayer);
+        }
+
         mounted() {
             this.fitMap();
+        }
+
+        @Watch('active')
+        private __onActiveChange(isActive: boolean) {
+            this.mapLayer.isActive = isActive;
         }
     }
 </script>
@@ -67,7 +84,17 @@
         font-size: 0.9em;
         display: flex;
         align-items: center;
-        padding: 0.1em;
+        padding: 0.6em 0.2em 0.6em 0;
+        border-bottom: solid 1px #C8C8C8;
+        background-color: #ffffff;
+    }
+
+    .layer-control.active {
+        background-color: #e6e6e6;
+    }
+
+    .layer-control:hover {
+        background-color: #C8C8C8;
     }
 
     .layer-control > .layer-control-name {

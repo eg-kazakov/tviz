@@ -5,8 +5,9 @@
                     v-for="layer in layers"
                     :key="layer.name"
                     :mapLayer="layer"
+                    :active="layer === activeLayer"
             ></layer-control>
-            <input type="file" @change="importCsv" :disabled="false">
+            <input type="file" @change="importCsv" :disabled="isInProgress">
         </div>
         <div class="map-panel"></div>
     </div>
@@ -25,9 +26,11 @@
 
     @Component ({components: {LayerControl}})
     export default class App extends Vue {
+        private __map!: Lmap;
+        // ToDo: Use index or id???
+        activeLayer: MapLayerBase|null = null;
         layers: MapLayerBase[] = [];
         isInProgress: boolean = false;
-        map: Lmap|null = null;
 
         importCsv(event: Event) {
             const fileInput = <HTMLInputElement>event.target;
@@ -40,9 +43,9 @@
             this.isInProgress = true;
             loadCsv(file)
                 .then((csvResult: CsvData) => {
-                    console.log('Loaded:', csvResult.data.length);
+                    console.log(`Loaded: ${csvResult.data.length} rows`);
 
-                    if(!this.map) return;
+                    if(!this.__map) return;
 
                     const headersSet = new Set(csvResult.fields);
                     if (!headersSet.has('lat') || !headersSet.has('lat')) {
@@ -50,6 +53,7 @@
                         return;
                     }
 
+                    let newLayer: MapLayerBase;
                     if (headersSet.has('segment_id')) {
                         console.log('Segments mode');
                         const segments: TrajectorySegment[] = csvResult.data.reduce(
@@ -62,14 +66,19 @@
                                 return acc;
                             },
                             []);
-                        this.layers.push(new SegmentsMapLayer(file.name, segments, this.map));
+                        newLayer = new SegmentsMapLayer(file.name, segments, this.__map);
                     } else {
                         console.log('GPS mode');
                         const coords = csvResult.data.map(row => ({
                             lat: parseFloat(row.lat),
                             lng: parseFloat(row.lon)
                         }));
-                        this.layers.push(new GPSMapLayer(file.name, coords, this.map));
+                        newLayer = new GPSMapLayer(file.name, coords, this.__map);
+                    }
+
+                    if(newLayer) {
+                        this.layers.push(newLayer);
+                        this.activeLayer = newLayer;
                     }
                 })
                 .catch(err => console.error(err))
@@ -78,15 +87,16 @@
 
         mounted() {
             this.$on('remove-layer', (layer: MapLayerBase) => this.layers.splice(this.layers.indexOf(layer), 1));
+            this.$on('set-active-layer', (layer: MapLayerBase) => this.activeLayer = layer);
 
-            this.map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
+            this.__map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
             tileLayer(
                 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                     subdomains: ['a','b','c']
                 }
-            ).addTo(this.map);
+            ).addTo(this.__map);
         }
     }
 </script>
@@ -102,6 +112,9 @@
 
     .tviz-app > .control-panel {
         flex: 1 0 auto;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
+        z-index: 500;
+        background-color: #f2f2f2;
     }
 
     .tviz-app > .map-panel {
