@@ -1,9 +1,11 @@
 <template>
     <div class="tviz-app">
         <div class="control-panel">
-            <!-- Name: <input v-model="name" type="text"> -->
-            <!-- <hello-component :name="name" :initialEnthusiasm="5" /> -->
-            <div v-for="layer in layers" v-bind:key="layer">{{ layer }}</div>
+            <layer-control
+                    v-for="layer in layers"
+                    :key="layer.name"
+                    :mapLayer="layer"
+            ></layer-control>
             <input type="file" @change="importCsv" :disabled="false">
         </div>
         <div class="map-panel"></div>
@@ -11,28 +13,20 @@
 </template>
 
 <script lang="ts">
-    // import HelloComponent from './components/Hello.vue';
-    import {map as lMap, Map as Lmap, circleMarker, CircleMarker, featureGroup, tileLayer, 
-        DomEvent, polyline, Polyline, LatLng, LatLngExpression} from 'leaflet';
+    import {map as lMap, Map as Lmap, tileLayer} from 'leaflet';
     import Vue from 'vue';
     import {parse as csvFileParse} from 'papaparse';
-    import {Component} from 'vue-property-decorator'
+    import {Component} from 'vue-property-decorator';
+    import LayerControl from './components/LayerControl';
+    import {TrajectorySegment} from "./TrajectorySegment";
+    import {SegmentsMapLayer} from "./SegmentsMapLayer";
+    import {GPSMapLayer} from "./GPSMapLayer";
+    import {MapLayerBase} from "./MapLayerBase";
 
-    class ColorRotator {
-        __index: number = 0;
-        static __colorWheel: string[] = ['#ffe600', '#04ffe2', '#b3ff00', '#0421ff', '#ffa600', '#11ff04'];
-        nextColor(): string {
-            if (this.__index >= ColorRotator.__colorWheel.length) {
-                this.__index = 0;
-            }
-            return ColorRotator.__colorWheel[this.__index++];
-        }
-    }
-
-    @Component
+    @Component ({components: {LayerControl}})
     export default class App extends Vue {
-        layers: String[] = [];
-        isInProgress: Boolean = false;
+        layers: MapLayerBase[] = [];
+        isInProgress: boolean = false;
         map: Lmap|null = null;
 
         importCsv(event: Event) {
@@ -40,7 +34,8 @@
             if(!fileInput.files) return;
 
             const file = fileInput.files[0];
-            if (this.layers.some(l => l === file.name)) return;
+            fileInput.files = null;
+            if (this.layers.some(l => l.sourceName === file.name)) return;
 
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
@@ -63,38 +58,25 @@
 
                     if (headersSet.has('segment_id')) {
                         console.log('Segments mode');
-                        const segments: Map<String, LatLngExpression[]> = results.data.reduce(
-                            (acc, row) => {
-                                if (!acc.has(row.segment_id)) {
-                                    acc.set(row.segment_id, []);
+                        const segments: TrajectorySegment[] = results.data.reduce(
+                            (acc: TrajectorySegment[], row) => {
+                                const latLng = {lat: parseFloat(row.lat), lng: parseFloat(row.lon)};
+                                if (acc.length < 1 || acc[acc.length - 1].segmentId != row.segment_id) {
+                                    acc.push(new TrajectorySegment(row.segment_id));
                                 }
-                                acc.get(row.segment_id).push([parseFloat(row.lat), parseFloat(row.lon)]);
+                                acc[acc.length - 1].points.push(latLng);
                                 return acc;
                             },
-                            new Map());
-
-                        const lines: Polyline[] = [];
-                        const markers: CircleMarker[] =  [];
-                        const colorer = new ColorRotator();
-                        for(const [segmentId, coords] of segments.entries()){
-                            const color = colorer.nextColor();
-                            lines.push(polyline(coords, {color}));
-                            for (const coord of coords){
-                                markers.push(this.__createCircleMarker(coord, color));
-                            }
-                        }
-                        const lineLayer = featureGroup(lines).addTo(this.map);
-                        const markersLayer = featureGroup(markers).addTo(this.map);  
-                        this.map.fitBounds(markersLayer.getBounds());    
+                            []);
+                        this.layers.push(new SegmentsMapLayer(file.name, segments, this.map));
                     } else {
                         console.log('GPS mode');
-                        const markers = results.data.map(row => 
-                            this.__createCircleMarker([parseFloat(row.lat), parseFloat(row.lon)], '#aaaaaa'));
-                        const markersLayer = featureGroup(markers).addTo(this.map);   
-                        this.map.fitBounds(markersLayer.getBounds());                    
+                        const coords = results.data.map(row => ({
+                            lat: parseFloat(row.lat),
+                            lng: parseFloat(row.lon)
+                        }));
+                        this.layers.push(new GPSMapLayer(file.name, coords, this.map));
                     }
-
-                    this.layers.push(file.name);
                     this.isInProgress = false;
                 },
                 error: () => {
@@ -104,6 +86,8 @@
         }
 
         mounted() {
+            this.$on('remove-layer', (layer: MapLayerBase) => this.layers.splice(this.layers.indexOf(layer), 1));
+
             this.map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
             tileLayer(
                 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -112,16 +96,6 @@
                     subdomains: ['a','b','c']
                 }
             ).addTo(this.map);
-        }
-
-        __createCircleMarker(coord: LatLngExpression, color: string): CircleMarker{
-            return circleMarker(coord,{
-                    radius: 4,
-                    weight: 1,
-                    color: '#606060',
-                    fillColor: color,
-                    fillOpacity: 0.8,
-            });
         }
     }
 </script>
