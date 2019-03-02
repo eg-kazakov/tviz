@@ -1,6 +1,13 @@
 <template>
     <div class="layer-control">
-        <div class="layer-control-name">
+        <input
+            v-model="isVisible"
+            type="checkbox"
+        >
+        <div
+            class="layer-control-name"
+            :title="name"
+        >
             {{ name }}
         </div>
         <button
@@ -21,7 +28,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import {Component, Prop} from 'vue-property-decorator';
-    import {MapLayerBase} from '../MapLayerBase';
+    import {MapLayerBase} from '../mapLayers/MapLayerBase';
 
     @Component
     export default class LayerControl extends Vue {
@@ -30,6 +37,14 @@
 
         get name(): String {
             return this.mapLayer.fullTitle;
+        }
+
+        get isVisible():boolean {
+            return this.mapLayer.isVisible;
+        }
+
+        set isVisible(isVisible: boolean) {
+            this.mapLayer.isVisible = isVisible;
         }
 
         removeLayer() {
@@ -56,9 +71,10 @@
     }
 
     .layer-control > .layer-control-name {
-        flex: 1 0 auto;
+        flex: 1 1 auto;
         overflow: hidden;
-        text-overflow: clip;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .layer-control > .layer-control-button {

@@ -13,6 +13,7 @@ export function createCircleMarker(coord: LatLngLiteral, color: string): CircleM
 export abstract class MapLayerBase{
     protected readonly __map: LMap;
     protected __features: FeatureGroup|null = null;
+    protected __isVisible: boolean = true;
     readonly sourceName: String;
 
     protected constructor(map: LMap, name: String) {
@@ -21,6 +22,18 @@ export abstract class MapLayerBase{
     }
 
     abstract get fullTitle(): String;
+
+    get isVisible(){
+        return this.__isVisible;
+    }
+
+    set isVisible(isVisible: boolean){
+        if(this.__isVisible === isVisible || !this.__features) return;
+
+        if (isVisible) this.__features.addTo(this.__map);
+        else this.__features.remove();
+        this.__isVisible = isVisible;
+    }
 
     fitMap() {
         if (!this.__features) return;

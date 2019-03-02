@@ -1,7 +1,7 @@
 import {CircleMarker, featureGroup, Map as LMap, polyline, Polyline} from 'leaflet';
 import {MapLayerBase, createCircleMarker} from './MapLayerBase';
-import {TrajectorySegment} from "./TrajectorySegment";
-import {ColorRotator} from "./colorsHelper";
+import {TrajectorySegment} from '../TrajectorySegment';
+import {ColorRotator} from '../colorsHelper';
 
 export class SegmentsMapLayer extends MapLayerBase {
     constructor(name: String, segments: TrajectorySegment[], map: LMap){
@@ -24,7 +24,8 @@ export class SegmentsMapLayer extends MapLayerBase {
                 markers.push(createCircleMarker(coord, color));
             }
         }
+        this.__features = featureGroup([...markers, ...lines]);
 
-        this.__features = featureGroup([...markers, ...lines]).addTo(this.__map);
+        if (this.__isVisible) this.__features.addTo(this.__map);
     }
 }

@@ -13,6 +13,8 @@ export class GPSMapLayer extends MapLayerBase {
 
     private __drawMarkers(points: LatLngLiteral[]){
         const markers = points.map(latLng => createCircleMarker(latLng, '#aaaaaa'));
-        this.__features = featureGroup(markers).addTo(this.__map);
+        this.__features = featureGroup(markers);
+
+        if (this.__isVisible) this.__features.addTo(this.__map);
     }
 }

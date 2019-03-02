@@ -17,10 +17,10 @@
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
     import LayerControl from './components/LayerControl';
-    import {TrajectorySegment} from "./TrajectorySegment";
-    import {SegmentsMapLayer} from "./SegmentsMapLayer";
-    import {GPSMapLayer} from "./GPSMapLayer";
-    import {MapLayerBase} from "./MapLayerBase";
+    import {TrajectorySegment} from './TrajectorySegment';
+    import {SegmentsMapLayer} from './mapLayers/SegmentsMapLayer';
+    import {GPSMapLayer} from './mapLayers/GPSMapLayer';
+    import {MapLayerBase} from './mapLayers/MapLayerBase';
     import {loadCsv, CsvData} from './csvLoader';
 
     @Component ({components: {LayerControl}})
