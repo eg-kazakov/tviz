@@ -101,6 +101,8 @@ export abstract class MapLayerBase {
     }
 
     __makeMarkerSelected(marker: CircleMarker) {
+        if (!this.__isActive) return;
+
         marker.setRadius(marker.getRadius() * 2);
         this.__selectedMarkers.add(marker)
     }

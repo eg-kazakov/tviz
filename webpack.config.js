@@ -10,7 +10,7 @@ module.exports = {
         publicPath: '/dist/',
         filename: 'build.js'
     },
-    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    mode: process.env.NODE_ENV === 'prod' ? 'production' : 'development',
     module: {
         rules: [
             {
