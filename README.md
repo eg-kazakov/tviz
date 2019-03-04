@@ -11,14 +11,14 @@ GPS trips/traces visual editor
 **Map**
 - ~~Show points and segments on map *(0)*~~
 - ~~Different colors for segments *(0)*~~
-- Points/segments selection on map *(1)*
+- ~~Points/segments selection on map *(1)*~~
 - Edit GPS (add, remove, move) *(2)*
 
 **Layers control**
 - Show GPS/trips/trajectories layers *(1)*
 - Separate layers for each device (probe) *(1)*
 - ~~Show/hide layers on map *(1)*~~
-- Show full point/segment row content for selected points/segments with header in popup *(1)*
+- ~~Show full point/segment row content for selected points/segments with header in popup *(1)*~~
 - Selected rows content filtering
 - Add new GPS layer *(2)*
 - ~~Delete layer *(2)*~~

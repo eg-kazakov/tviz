@@ -1,28 +1,23 @@
 <template>
-    <div
-        class="layer-control"
+    <div class="layer-control"
         :class="{active}"
         @click="setActive"
     >
-        <input
-            v-model="isVisible"
+        <input v-model="isVisible"
             type="checkbox"
             @click.stop=""
         >
-        <div
-            class="layer-control-name"
+        <div class="layer-control-name"
             :title="name"
         >
             {{ name }}
         </div>
-        <button
-            class="layer-control-button"
+        <button class="layer-control-button"
             @click.stop="fitMap"
         >
             &#10536;&#10538;
         </button>
-        <button
-            class="layer-control-button"
+        <button class="layer-control-button"
             @click.stop="removeLayer"
         >
             &#10062;
@@ -40,8 +35,8 @@
         @Prop()
         readonly mapLayer!: MapLayerBase;
 
-        @Prop()
-        readonly active!: boolean;
+        @Prop({default: false})
+        active!: boolean;
 
         get name(): String {
             return this.mapLayer.fullTitle;
@@ -69,6 +64,7 @@
         }
 
         mounted() {
+            this.mapLayer.isActive = this.active;
             this.fitMap();
         }
 

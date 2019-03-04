@@ -1,15 +1,28 @@
 <template>
     <div class="tviz-app">
         <div class="control-panel">
-            <layer-control
-                    v-for="layer in layers"
-                    :key="layer.name"
-                    :mapLayer="layer"
-                    :active="layer === activeLayer"
+            <layer-control v-for="layer in layers"
+                :key="layer.name"
+                :mapLayer="layer"
+                :active="layer === activeLayer"
             ></layer-control>
-            <input type="file" @change="importCsv" :disabled="isInProgress">
+            <input type="file"
+                   @change="csvFileOpenedHandler"
+                   :disabled="isInProgress"
+            >
+            <button @click="showCsvRowsModal">
+                Show selected
+            </button>
         </div>
         <div class="map-panel"></div>
+        <div v-if="isModalVisible" class="popup-dialog-veil">
+            <div class="popup-dialog-content">
+                <csv-table-component :csvData="csvDialogData"></csv-table-component>
+                <div class="popup-dialog-buttons">
+                    <button @click="hideModal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -18,13 +31,12 @@
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
     import LayerControl from './components/LayerControl';
-    import {TrajectorySegment} from './TrajectorySegment';
-    import {SegmentsMapLayer} from './mapLayers/SegmentsMapLayer';
-    import {GPSMapLayer} from './mapLayers/GPSMapLayer';
+    import CsvTableComponent from './components/CsvTableComponent';
     import {MapLayerBase} from './mapLayers/MapLayerBase';
-    import {loadCsv, CsvData} from './csvLoader';
+    import {createMapLayer} from './mapLayers/mapLayersFactory';
+    import {loadCsv} from './csvLoader';
 
-    @Component ({components: {LayerControl}})
+    @Component ({components: {LayerControl, CsvTableComponent}})
     export default class App extends Vue {
         private __map!: Lmap;
         // ToDo: Use index or id???
@@ -32,7 +44,12 @@
         layers: MapLayerBase[] = [];
         isInProgress: boolean = false;
 
-        importCsv(event: Event) {
+        csvDialogData: string[][] = [];
+        get isModalVisible() {
+            return this.csvDialogData.length > 0;
+        }
+
+        csvFileOpenedHandler(event: Event) {
             const fileInput = <HTMLInputElement>event.target;
             if(!fileInput.files) return;
 
@@ -42,47 +59,23 @@
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
             loadCsv(file)
-                .then((csvResult: CsvData) => {
-                    console.log(`Loaded: ${csvResult.data.length} rows`);
-
-                    if(!this.__map) return;
-
-                    const headersSet = new Set(csvResult.fields);
-                    if (!headersSet.has('lat') || !headersSet.has('lat')) {
-                        console.error(`Unsupported format: ${csvResult.fields.join(', ')}`);
-                        return;
-                    }
-
-                    let newLayer: MapLayerBase;
-                    if (headersSet.has('segment_id')) {
-                        console.log('Segments mode');
-                        const segments: TrajectorySegment[] = csvResult.data.reduce(
-                            (acc: TrajectorySegment[], row) => {
-                                const latLng = {lat: parseFloat(row.lat), lng: parseFloat(row.lon)};
-                                if (acc.length < 1 || acc[acc.length - 1].segmentId != row.segment_id) {
-                                    acc.push(new TrajectorySegment(row.segment_id));
-                                }
-                                acc[acc.length - 1].points.push(latLng);
-                                return acc;
-                            },
-                            []);
-                        newLayer = new SegmentsMapLayer(file.name, segments, this.__map);
-                    } else {
-                        console.log('GPS mode');
-                        const coords = csvResult.data.map(row => ({
-                            lat: parseFloat(row.lat),
-                            lng: parseFloat(row.lon)
-                        }));
-                        newLayer = new GPSMapLayer(file.name, coords, this.__map);
-                    }
-
-                    if(newLayer) {
-                        this.layers.push(newLayer);
-                        this.activeLayer = newLayer;
-                    }
+                .then(csvResult => {
+                    const newLayer = createMapLayer(csvResult, file.name, this.__map);
+                    this.layers.push(newLayer);
+                    this.activeLayer = newLayer;
                 })
                 .catch(err => console.error(err))
                 .finally(() => this.isInProgress = false);
+        }
+
+        showCsvRowsModal() {
+            if (!this.activeLayer) return;
+
+            this.csvDialogData = this.activeLayer.getSelectionData();
+        }
+
+        hideModal() {
+            this.csvDialogData = [];
         }
 
         mounted() {
@@ -119,5 +112,32 @@
 
     .tviz-app > .map-panel {
         flex: 1 1 100%;
+    }
+
+    .popup-dialog-veil {
+        display: flex;
+        align-items: center;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(160, 160, 160, 0.4);
+        z-index: 999;
+        justify-content: center;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .popup-dialog-content {
+        flex: 0 0 auto;
+        padding: 10px;
+        background-color: white;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .popup-dialog-buttons {
+        text-align: right;
+        margin-top: 10px;
     }
 </style>

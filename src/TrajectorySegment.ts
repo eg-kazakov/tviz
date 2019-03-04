@@ -1,11 +1,11 @@
-import {LatLngLiteral} from "leaflet";
+import {PointData} from './PointData';
 
 export class TrajectorySegment {
-    readonly segmentId: String;
-    readonly points: LatLngLiteral[];
+    readonly segmentId: string;
+    readonly coords: PointData[];
 
-    constructor(segmentId: String, points: LatLngLiteral[] = []) {
+    constructor(segmentId: string, coords: PointData[] = []) {
         this.segmentId = segmentId;
-        this.points = points;
+        this.coords = coords;
     }
 }
