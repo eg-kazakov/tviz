@@ -38,7 +38,7 @@
         @Prop({default: false})
         active!: boolean;
 
-        get name(): String {
+        get name(): string {
             return this.mapLayer.fullTitle;
         }
 

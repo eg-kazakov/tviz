@@ -4,9 +4,10 @@ import {TrajectorySegment} from '../TrajectorySegment';
 import {PointData} from '../PointData';
 import {SegmentsMapLayer} from './SegmentsMapLayer';
 import {GPSMapLayer} from './GPSMapLayer';
+import {MapLayerBase} from './MapLayerBase';
 
 
-export function createMapLayer(csvResult: CsvData, sourceName: string, map: LMap) {
+export function createMapLayer(csvResult: CsvData, sourceName: string, map: LMap): MapLayerBase {
     const headersSet = new Set(csvResult.fields);
     if (!headersSet.has('lat') || !headersSet.has('lat')) {
         throw new Error(`Unsupported format: ${csvResult.fields.join(', ')}`);

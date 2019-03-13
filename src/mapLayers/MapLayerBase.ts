@@ -22,15 +22,15 @@ export abstract class MapLayerBase {
     protected __features: FeatureGroup|null = null;
     protected __isVisible: boolean = true;
     protected __isActive: boolean = false;
-    readonly sourceName: String;
+    readonly sourceName: string;
 
-    protected constructor(map: LMap, name: String, csvHeader: string[]) {
+    protected constructor(map: LMap, name: string, csvHeader: string[]) {
         this.__map = map;
         this.sourceName = name;
         this.__csvHeader = csvHeader;
     }
 
-    abstract get fullTitle(): String;
+    abstract get fullTitle(): string;
 
     get isVisible(){
         return this.__isVisible;

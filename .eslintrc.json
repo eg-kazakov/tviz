@@ -1,18 +1,12 @@
 {
   "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
     "plugin:vue/recommended",
-    "eslint:recommended",
     "@vue/typescript"
   ],
-  "parserOptions": {
-    "parser": "@typescript-eslint/parser",
-    "ecmaVersion": 2017,
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
-    },
-    "sourceType": "module"
-  },
+
+  "parser": "@typescript-eslint/parser",
 
   "env": {
     "browser": true,
@@ -20,12 +14,7 @@
     "node": true
   },
 
-  "plugins": [
-    "import",
-    "node",
-    "promise",
-    "standard"
-  ],
+  "plugins": ["@typescript-eslint"],
 
   "globals": {
     "document": false,
