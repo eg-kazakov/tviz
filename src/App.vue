@@ -32,7 +32,7 @@
     import {Component} from 'vue-property-decorator';
     import LayerControl from './components/LayerControl';
     import CsvTableComponent from './components/CsvTableComponent';
-    import {MapLayerBase} from './mapLayers/MapLayerBase';
+    import {IMapLayer} from './mapLayers/MapLayerBase';
     import {createMapLayer} from './mapLayers/mapLayersFactory';
     import {loadCsv} from './csvLoader';
 
@@ -40,8 +40,8 @@
     export default class App extends Vue {
         private __map!: Lmap;
         // ToDo: Use index or id???
-        activeLayer: MapLayerBase|null = null;
-        layers: MapLayerBase[] = [];
+        activeLayer: IMapLayer|null = null;
+        layers: IMapLayer[] = [];
         isInProgress: boolean = false;
 
         csvDialogData: string[][] = [];
@@ -54,24 +54,25 @@
             if(!fileInput.files) return;
 
             const file = fileInput.files[0];
-            if (this.layers.some(l => l.sourceName === file.name)) return;
+            if (file && this.layers.some(l => l.layerName === file.name)) return;
 
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
             loadCsv(file)
-                .then(csvResult => {
-                    const newLayer = createMapLayer(csvResult, file.name, this.__map);
-                    this.layers.push(newLayer);
+                .then(csvResult => createMapLayer(csvResult, file.name, this.__map))
+                .then(newLayer => {
+                    this.layers.unshift(newLayer);
                     this.activeLayer = newLayer;
+                    this.activeLayer.fitMap();
                 })
-                .catch(err => console.error(err))
+                .catch(console.error)
                 .finally(() => this.isInProgress = false);
         }
 
         showCsvRowsModal() {
             if (!this.activeLayer) return;
 
-            this.csvDialogData = this.activeLayer.getSelectionData();
+            this.csvDialogData = [this.activeLayer.getDataHeader(), ...this.activeLayer.getSelectionData()];
         }
 
         hideModal() {
@@ -79,8 +80,8 @@
         }
 
         mounted() {
-            this.$on('remove-layer', (layer: MapLayerBase) => this.layers.splice(this.layers.indexOf(layer), 1));
-            this.$on('set-active-layer', (layer: MapLayerBase) => this.activeLayer = layer);
+            this.$on('remove-layer', (layer: IMapLayer) => this.layers.splice(this.layers.indexOf(layer), 1));
+            this.$on('set-active-layer', (layer: IMapLayer) => this.activeLayer = layer);
 
             this.__map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
             tileLayer(

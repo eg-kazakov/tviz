@@ -4,13 +4,11 @@ import {TrajectorySegment} from '../TrajectorySegment';
 import {ColorRotator} from '../colorsHelper';
 
 export class SegmentsMapLayer extends MapLayerBase {
+    readonly typeNamePrefix: string = 'Seg';
+
     constructor(name: string, segments: TrajectorySegment[], csvHeader: string[], map: LMap){
         super(map, name, csvHeader);
         this.__drawMarkers(segments);
-    }
-
-    get fullTitle(): string {
-        return `Seg: ${this.sourceName}`
     }
 
     private __drawMarkers(segments: TrajectorySegment[]){

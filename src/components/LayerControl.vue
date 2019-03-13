@@ -28,12 +28,12 @@
 <script lang="ts">
     import Vue from 'vue';
     import {Component, Prop, Watch} from 'vue-property-decorator';
-    import {MapLayerBase} from '../mapLayers/MapLayerBase';
+    import {IMapLayer} from '../mapLayers/MapLayerBase';
 
     @Component
     export default class LayerControl extends Vue {
         @Prop()
-        readonly mapLayer!: MapLayerBase;
+        readonly mapLayer!: IMapLayer;
 
         @Prop({default: false})
         active!: boolean;
@@ -65,7 +65,6 @@
 
         mounted() {
             this.mapLayer.isActive = this.active;
-            this.fitMap();
         }
 
         @Watch('active')

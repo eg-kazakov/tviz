@@ -1,6 +1,6 @@
 import {LatLngLiteral} from "leaflet";
 
-export class PointData implements LatLngLiteral{
+export class PointData implements LatLngLiteral {
     readonly lat: number;
     readonly lng: number;
     readonly csvRow: any;

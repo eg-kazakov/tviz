@@ -3,13 +3,11 @@ import {MapLayerBase, createCircleMarker} from './MapLayerBase';
 import {PointData} from '../PointData';
 
 export class GPSMapLayer extends MapLayerBase {
+    readonly typeNamePrefix: string = 'GPS';
+
     constructor(name: string, points: PointData[], csvHeader: string[], map: LMap){
         super(map, name, csvHeader);
         this.__drawMarkers(points);
-    }
-
-    get fullTitle(): string {
-        return `GPS: ${this.sourceName}`
     }
 
     private __drawMarkers(coords: PointData[]){

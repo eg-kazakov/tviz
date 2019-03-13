@@ -1,4 +1,12 @@
-import {circleMarker, CircleMarker, CircleMarkerOptions, FeatureGroup, LatLngLiteral, Map as LMap} from 'leaflet';
+import {
+    circleMarker,
+    CircleMarker,
+    CircleMarkerOptions,
+    FeatureGroup,
+    LatLngBounds,
+    LatLngLiteral,
+    Map as LMap
+} from 'leaflet';
 
 const opacityActive = 0.8;
 const opacityInActive = 0.3;
@@ -14,23 +22,39 @@ export function createCircleMarker(coord: LatLngLiteral, color: string): CircleM
     });
 }
 
-export abstract class MapLayerBase {
+export interface IMapLayer {
+    readonly layerName: string;
+    readonly fullTitle: string;
+    isVisible: boolean;
+    isActive: boolean;
+
+    fitMap(): void;
+    clearMap(): void;
+    getDataHeader(): string[];
+    getSelectionData(): string[][];
+}
+
+export abstract class MapLayerBase implements IMapLayer{
     protected readonly __map: LMap;
     protected readonly __markerToSourceMap: Map<CircleMarker, any> = new Map();
     protected readonly __selectedMarkers: Set<CircleMarker> = new Set();
     protected readonly __csvHeader: string[];
-    protected __features: FeatureGroup|null = null;
+    protected __features!: FeatureGroup;
     protected __isVisible: boolean = true;
     protected __isActive: boolean = false;
-    readonly sourceName: string;
+
+    readonly layerName: string;
+    abstract readonly typeNamePrefix: string;
 
     protected constructor(map: LMap, name: string, csvHeader: string[]) {
         this.__map = map;
-        this.sourceName = name;
+        this.layerName = name;
         this.__csvHeader = csvHeader;
     }
 
-    abstract get fullTitle(): string;
+    get fullTitle(): string {
+        return `${this.typeNamePrefix}: ${this.layerName}`;
+    }
 
     get isVisible(){
         return this.__isVisible;
@@ -49,7 +73,7 @@ export abstract class MapLayerBase {
     }
 
     set isActive(isActive: boolean) {
-        if(this.__isActive === isActive || !this.__features) return;
+        if(this.__isActive === isActive) return;
 
         if(isActive) {
             this.__features.bringToFront();
@@ -65,24 +89,27 @@ export abstract class MapLayerBase {
     }
 
     fitMap() {
-        if (!this.__features) return;
-
         this.__map.fitBounds(this.__features.getBounds());
     }
 
-    clearMap() {
-        if (!this.__features) return;
+    getBounds(): LatLngBounds {
+        return this.__features.getBounds();
+    }
 
+    clearMap() {
         this.__features.remove();
         this.__selectedMarkers.clear();
         this.__markerToSourceMap.clear();
-        this.__features = null;
+    }
+
+    getDataHeader(): string[] {
+        return this.__csvHeader;
     }
 
     getSelectionData(): string[][] {
         if(this.__selectedMarkers.size < 1) return [];
 
-        const result = [this.__csvHeader];
+        const result = [];
         for (const marker of this. __selectedMarkers) {
             if (this.__markerToSourceMap.has(marker)) {
                 const csvRowObj = this.__markerToSourceMap.get(marker);
