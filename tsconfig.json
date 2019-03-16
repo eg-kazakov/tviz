@@ -5,15 +5,23 @@
         "sourceMap": true,
         "strict": true,
         "noImplicitReturns": true,
-        "module": "es2015",
+        "module": "esnext",
         "moduleResolution": "node",
         "target": "esnext",
+        "esModuleInterop": true,
         "lib": [
             "dom",
             "esnext"
         ]
     },
     "include": [
-        "./src/**/*"
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue",
+        "tests/**/*.ts",
+        "tests/**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules"
     ]
 }

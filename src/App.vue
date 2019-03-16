@@ -33,8 +33,8 @@
     import LayerControl from './components/LayerControl';
     import CsvTableComponent from './components/CsvTableComponent';
     import {IMapLayer} from './mapLayers/MapLayerBase';
-    import {createMapLayer} from './mapLayers/mapLayersFactory';
-    import {loadCsv} from './csvLoader';
+    import {mapLayersFactory} from './mapLayers/mapLayersFactory';
+    import {csvLoader} from './csvLoader';
 
     @Component ({components: {LayerControl, CsvTableComponent}})
     export default class App extends Vue {
@@ -58,8 +58,10 @@
 
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
-            loadCsv(file)
-                .then(csvResult => createMapLayer(csvResult, file.name, this.__map))
+            // ToDo: Rework to DI
+            csvLoader.loadCsv(file)
+                // ToDo: Rework to DI
+                .then(csvResult => mapLayersFactory.createMapLayer(csvResult, file.name, this.__map))
                 .then(newLayer => {
                     this.layers.unshift(newLayer);
                     this.activeLayer = newLayer;
