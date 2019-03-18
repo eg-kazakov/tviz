@@ -3,15 +3,22 @@
     "plugin:@typescript-eslint/recommended",
     "prettier/@typescript-eslint",
     "plugin:vue/recommended",
-    "@vue/typescript"
+    "@vue/typescript",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript"
   ],
 
-  "parser": "@typescript-eslint/parser",
+//  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "parser": "typescript-eslint-parser",
+    "ecmaVersion": 8,
+    "source": "module"
+  },
 
   "env": {
     "browser": true,
-    "es6": true,
-    "node": true
+    "es6": true
   },
 
   "plugins": ["@typescript-eslint"],
@@ -334,16 +341,7 @@
     "quote-props": ["error","as-needed"],
     "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
     "radix": ["error","as-needed"],
-    "require-jsdoc": [
-      "error",
-      {
-        "require": {
-          "ClassDeclaration": false,
-          "FunctionDeclaration": false,
-          "MethodDefinition": false
-        }
-      }
-    ],
+    "require-jsdoc": "off",
     "require-await": "error",
     "require-yield": "error",    
     "rest-spread-spacing": ["error", "never"],
@@ -388,17 +386,7 @@
     "import/no-duplicates": "error",
     "import/no-named-default": "error",
     "import/no-webpack-loader-syntax": "error",
-
-    "node/no-deprecated-api": "error",
-    "node/process-exit-as-throw": "error",
-
-    "promise/param-names": "error",
-
-    "standard/array-bracket-even-spacing": ["error", "either"],
-    "standard/computed-property-even-spacing": ["error", "even"],
-    "standard/no-callback-literal": "error",
-    "standard/object-curly-even-spacing": ["error", "either"],
-
+    "import/no-unresolved": "off",
 
     "vue/html-indent": ["error", 4, {
       "attribute": 1,

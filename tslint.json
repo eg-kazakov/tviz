@@ -1,3 +1,38 @@
 {
-  "extends": "tslint:all"
+  "extends": "tslint:all",
+  "rules": {
+    "align": false,
+    "arrow-parens": false,
+    "completed-docs": false,
+    "curly": false,
+    "file-name-casing": false,
+    "increment-decrement": false,
+    "member-access": [true, "no-public"],
+    "member-ordering": false,
+    "newline-before-return": false,
+    "no-console": false,
+    "no-inferrable-types": false,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "only-arrow-functions": false,
+    "ordered-imports": false,
+    "whitespace": [true,
+      "check-branch", "check-decl",
+      "check-operator", "check-separator",
+      "check-rest-spread",
+      "check-type",
+      "check-typecast",
+      "check-type-operator",
+      "check-preblock"
+    ],
+    "variable-name": false,
+
+
+
+    "no-magic-numbers": false,
+    "no-null-keyword": false,
+    "newline-per-chained-call": false,
+    "trailing-comma": false,
+    "typedef": false
+  }
 }

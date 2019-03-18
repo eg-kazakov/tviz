@@ -5,29 +5,29 @@
     >
         <div class="layer-control-panel">
             <input v-model="isVisible"
-                   type="checkbox"
-                   @click.stop=""
+                type="checkbox"
+                @click.stop=""
             >
             <div class="layer-control-name"
-                 :title="name"
+                :title="name"
             >
                 {{ name }}
             </div>
             <button class="layer-control-button"
-                    @click.stop="fitMap"
+                @click.stop="fitMap"
             >
                 &#10536;&#10538;
             </button>
             <button class="layer-control-button"
-                    @click.stop="removeLayer"
+                @click.stop="removeLayer"
             >
                 &#10062;
             </button>
         </div>
         <data-layer-control v-for="layer in subLayers"
-                       :key="layer.name"
-                       :mapLayer="layer"
-        ></data-layer-control>
+            :key="layer.name"
+            :map-layer="layer"
+        />
     </div>
 </template>
 

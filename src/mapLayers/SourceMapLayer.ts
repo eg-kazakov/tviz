@@ -9,7 +9,7 @@ export class SourceMapLayer {
     readonly layerName: string;
     readonly subLayers: DataMapLayerBase[];
 
-    constructor(map: LMap, sourceName: string, layers: DataMapLayerBase[], csvHeader: string[]){
+    constructor(map: LMap, sourceName: string, layers: DataMapLayerBase[], csvHeader: string[]) {
         this.__map = map;
         this.subLayers = layers;
         this.layerName = sourceName;
@@ -20,23 +20,23 @@ export class SourceMapLayer {
         return this.subLayers.length > 0 ? this.subLayers[0].typeNamePrefix : 'EMPT';
     }
 
-    get isVisible(){
+    get isVisible() {
         return this.__isVisible;
     }
 
-    set isVisible(isVisible: boolean){
-        if(this.__isVisible === isVisible) return;
+    set isVisible(isVisible: boolean) {
+        if (this.__isVisible === isVisible) return;
 
         this.subLayers.forEach(layer => layer.isVisible = isVisible);
         this.__isVisible = isVisible;
     }
 
-    get isActive(){
+    get isActive() {
         return this.__isActive;
     }
 
     set isActive(isActive: boolean) {
-        if(this.__isActive === isActive) return;
+        if (this.__isActive === isActive) return;
 
         this.subLayers.forEach(layer => layer.isActive = isActive);
         this.__isActive = isActive;

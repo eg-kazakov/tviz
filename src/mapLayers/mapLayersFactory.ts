@@ -1,23 +1,28 @@
-import {CsvData} from '../csvLoader';
 import {Map as LMap} from 'leaflet';
+
+import {GPSMapLayer} from './GPSMapLayer';
+import {ICsvData} from '../csvLoader';
 import {TrajectorySegment} from '../TrajectorySegment';
 import {PointData} from '../PointData';
 import {SegmentsMapLayer} from './SegmentsMapLayer';
-import {GPSMapLayer} from './GPSMapLayer';
 import {SourceMapLayer} from './SourceMapLayer';
 
-function parseGPS(csvData: {[key: string]: string}[], latitudeColName: string, longitudeColName: string): PointData[] {
+function parseGPS(csvData: Array<{[key: string]: string}>
+    , latitudeColName: string
+    , longitudeColName: string
+): PointData[] {
     return csvData.map(row => new PointData(parseFloat(row[latitudeColName]), parseFloat(row[longitudeColName]), row));
 }
 
-function parseSegments(csvData: {[key: string]: string}[]
+function parseSegments(csvData: Array<{[key: string]: string}>
                        , latitudeColName: string
                        , longitudeColName: string
                        , segmentColName: string): TrajectorySegment[] {
     return csvData.reduce(
         (acc: TrajectorySegment[], row) => {
-            const coord = new PointData(parseFloat(row[latitudeColName]), parseFloat(row[longitudeColName]), row);
-            if (acc.length < 1 || acc[acc.length - 1].segmentId != row[segmentColName]) {
+            const coord: PointData
+                = new PointData(parseFloat(row[latitudeColName]), parseFloat(row[longitudeColName]), row);
+            if (acc.length < 1 || acc[acc.length - 1].segmentId !== row[segmentColName]) {
                 acc.push(new TrajectorySegment(row[segmentColName]));
             }
             acc[acc.length - 1].coords.push(coord);
@@ -26,7 +31,7 @@ function parseSegments(csvData: {[key: string]: string}[]
         []);
 }
 
-function createMapLayer(csvResult: CsvData, map: LMap): SourceMapLayer {
+function createMapLayer(csvResult: ICsvData, map: LMap): SourceMapLayer {
     const inputColsSet = new Set(csvResult.fields);
 
     const latitudeColNames = ['lat', 'latitude'];
@@ -45,7 +50,7 @@ function createMapLayer(csvResult: CsvData, map: LMap): SourceMapLayer {
         throw new Error(`Unsupported format: ${csvResult.fields.join(', ')}`);
     }
 
-    const chunksDict: Map<string, {[key: string]: string}[]> =
+    const chunksDict: Map<string, Array<{[key: string]: string}>> =
         chunkColName
             ? csvResult.data.reduce((acc, row) => {
                 if (acc.has(row[chunkColName])) acc.get(row[chunkColName]).push(row);
@@ -55,7 +60,7 @@ function createMapLayer(csvResult: CsvData, map: LMap): SourceMapLayer {
             : new Map([[csvResult.fileName, csvResult.data]]);
 
     const sourceLayer = new SourceMapLayer(map, csvResult.fileName, [], csvResult.fields);
-    for (const [key, value] of chunksDict.entries()){
+    for (const [key, value] of chunksDict.entries()) {
         if (segmentColName) {
             const segments = parseSegments(value, latitudeColName, longitudeColName, segmentColName);
             sourceLayer.subLayers.push(

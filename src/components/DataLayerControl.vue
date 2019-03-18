@@ -1,16 +1,16 @@
 <template>
     <div class="data-layer-control">
         <input v-model="isVisible"
-               type="checkbox"
-               @click.stop=""
+            type="checkbox"
+            @click.stop=""
         >
         <div class="layer-control-name"
-             :title="name"
+            :title="name"
         >
             {{ name }}
         </div>
         <button class="layer-control-button"
-                @click.stop="fitMap"
+            @click.stop="fitMap"
         >
             &#10536;&#10538;
         </button>

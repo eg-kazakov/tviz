@@ -3,23 +3,27 @@
         <div class="control-panel">
             <source-layer-control v-for="layer in layers"
                 :key="layer.name"
-                :mapLayer="layer"
+                :map-layer="layer"
                 :active="layer === activeLayer"
-            ></source-layer-control>
+            />
             <input type="file"
-                   @change="csvFileOpenedHandler"
-                   :disabled="isInProgress"
+                :disabled="isInProgress"
+                @change="csvFileOpenedHandler"
             >
             <button @click="showCsvRowsModal">
                 Show selected
             </button>
         </div>
         <div class="map-panel"></div>
-        <div v-if="isModalVisible" class="popup-dialog-veil">
+        <div v-if="isModalVisible"
+            class="popup-dialog-veil"
+        >
             <div class="popup-dialog-content">
-                <csv-table-component :csvData="csvDialogData"></csv-table-component>
+                <csv-table-component :csv-data="csvDialogData" />
                 <div class="popup-dialog-buttons">
-                    <button @click="hideModal">Close</button>
+                    <button @click="hideModal">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -27,6 +31,8 @@
 </template>
 
 <script lang="ts">
+    /* eslint-disable no-console */
+
     import {map as lMap, Map as Lmap, tileLayer} from 'leaflet';
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
@@ -36,7 +42,7 @@
     import {csvLoader} from './csvLoader';
     import {SourceMapLayer} from './mapLayers/SourceMapLayer';
 
-    @Component ({components: {SourceLayerControl, CsvTableComponent}})
+    @Component({components: {SourceLayerControl, CsvTableComponent}})
     export default class App extends Vue {
         private __map!: Lmap;
         // ToDo: Use index or id???
@@ -50,11 +56,11 @@
         }
 
         csvFileOpenedHandler(event: Event) {
-            const fileInput = <HTMLInputElement>event.target;
-            if(!fileInput.files) return;
+            const fileInput = event.target as HTMLInputElement;
+            if (!fileInput.files) return;
 
             const file = fileInput.files[0];
-            if (file && this.layers.some(l => l.layerName === file.name)) return;
+            if (!file || this.layers.some(lr => lr.layerName === file.name)) return;
 
             console.log(`File ${file.name}: ${file.size} bytes.`);
             this.isInProgress = true;
@@ -70,7 +76,7 @@
                     this.activeLayer.fitMap();
                 })
                 .catch(console.error)
-                .finally(() => this.isInProgress = false);
+                .finally(() => (this.isInProgress = false));
         }
 
         showCsvRowsModal() {
@@ -85,14 +91,15 @@
 
         mounted() {
             this.$on('remove-layer', (layer: SourceMapLayer) => this.layers.splice(this.layers.indexOf(layer), 1));
-            this.$on('set-active-layer', (layer: SourceMapLayer) => this.activeLayer = layer);
+            this.$on('set-active-layer', (layer: SourceMapLayer) => (this.activeLayer = layer));
 
-            this.__map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
+            // eslint-disable-next-line no-magic-numbers
+            this.__map = lMap(this.$el.querySelector('.map-panel') as HTMLElement).setView([51.505, -0.09], 13);
             tileLayer(
                 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                    subdomains: ['a','b','c']
+                    subdomains: ['a', 'b', 'c']
                 }
             ).addTo(this.__map);
         }
