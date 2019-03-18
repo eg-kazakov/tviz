@@ -7,6 +7,7 @@ GPS trips/traces visual editor
 - ~~Load csv files *(0)*~~
 - Export layer to csv file *(2)*
 - ~~Autodetect GPS and trajectory files by columns name in header *(0)*~~
+- Configurable coordinates, segments id, trips/traces/probes id field names
 
 **Map**
 - ~~Show points and segments on map *(0)*~~
@@ -22,12 +23,13 @@ GPS trips/traces visual editor
 - Selected rows content filtering
 - Add new GPS layer *(2)*
 - ~~Delete layer *(2)*~~
+- Multiple sources row content selection
 
 **Gps generation**
 - Generate GPS points for route (count, deviation)
 
 ~~*(0)* - To implement in prototype~~  
-~~*(1)* - To implement on 1st step~~
+~~*(1)* - To implement on 1st step~~  
 *(2)* - To implement on 2nd step  
 
 ## Notes:
