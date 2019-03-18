@@ -1,6 +1,7 @@
 import {parse as csvFileParse, ParseError} from 'papaparse';
 
 export interface CsvData {
+    fileName: string,
     fields: string[];
     data: {[key: string]: string}[];
 }
@@ -13,7 +14,7 @@ export const csvLoader = {
                 header: true,
                 complete: results => {
                     console.log(`Loaded: ${results.data.length} rows.`);
-                    return resolve({fields: results.meta.fields, data: results.data});
+                    return resolve({fields: results.meta.fields, data: results.data, fileName: file.name});
                 },
                 error: (err: ParseError) => reject(new Error(`${err.type}: ${err.message} at ln ${err.row}`)),
             });

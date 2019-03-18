@@ -1,12 +1,12 @@
 import {CircleMarker, featureGroup, Map as LMap} from 'leaflet';
-import {MapLayerBase, createCircleMarker} from './MapLayerBase';
+import {DataMapLayerBase, createCircleMarker} from './DataMapLayerBase';
 import {PointData} from '../PointData';
 
-export class GPSMapLayer extends MapLayerBase {
-    readonly typeNamePrefix: string = 'GPS';
+export class GPSMapLayer extends DataMapLayerBase {
+    readonly typeNamePrefix: string = 'gps';
 
-    constructor(name: string, points: PointData[], csvHeader: string[], map: LMap){
-        super(map, name, csvHeader);
+    constructor(name: string, points: PointData[], csvHeader: string[], chunkColName: string, map: LMap){
+        super(map, name, csvHeader, chunkColName);
         this.__drawMarkers(points);
     }
 

@@ -1,13 +1,13 @@
 import {CircleMarker, featureGroup, Map as LMap, polyline, Polyline} from 'leaflet';
-import {MapLayerBase, createCircleMarker} from './MapLayerBase';
+import {DataMapLayerBase, createCircleMarker} from './DataMapLayerBase';
 import {TrajectorySegment} from '../TrajectorySegment';
 import {ColorRotator} from '../colorsHelper';
 
-export class SegmentsMapLayer extends MapLayerBase {
-    readonly typeNamePrefix: string = 'Seg';
+export class SegmentsMapLayer extends DataMapLayerBase {
+    readonly typeNamePrefix: string = 'seg';
 
-    constructor(name: string, segments: TrajectorySegment[], csvHeader: string[], map: LMap){
-        super(map, name, csvHeader);
+    constructor(name: string, segments: TrajectorySegment[], csvHeader: string[], chunkColName: string, map: LMap){
+        super(map, name, csvHeader, chunkColName);
         this.__drawMarkers(segments);
     }
 

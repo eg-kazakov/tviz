@@ -15,8 +15,8 @@ GPS trips/traces visual editor
 - Edit GPS (add, remove, move) *(2)*
 
 **Layers control**
-- Show GPS/trips/trajectories layers *(1)*
-- Separate layers for each device (probe) *(1)*
+- ~~Show GPS/trips/trajectories layers *(1)*~~
+- ~~Separate layers for each device (probe) *(1)*~~
 - ~~Show/hide layers on map *(1)*~~
 - ~~Show full point/segment row content for selected points/segments with header in popup *(1)*~~
 - Selected rows content filtering
@@ -27,7 +27,7 @@ GPS trips/traces visual editor
 - Generate GPS points for route (count, deviation)
 
 ~~*(0)* - To implement in prototype~~  
-*(1)* - To implement on 1st step  
+~~*(1)* - To implement on 1st step~~
 *(2)* - To implement on 2nd step  
 
 ## Notes:

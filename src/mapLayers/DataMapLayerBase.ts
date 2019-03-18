@@ -22,19 +22,7 @@ export function createCircleMarker(coord: LatLngLiteral, color: string): CircleM
     });
 }
 
-export interface IMapLayer {
-    readonly layerName: string;
-    readonly fullTitle: string;
-    isVisible: boolean;
-    isActive: boolean;
-
-    fitMap(): void;
-    clearMap(): void;
-    getDataHeader(): string[];
-    getSelectionData(): string[][];
-}
-
-export abstract class MapLayerBase implements IMapLayer{
+export abstract class DataMapLayerBase {
     protected readonly __map: LMap;
     protected readonly __markerToSourceMap: Map<CircleMarker, any> = new Map();
     protected readonly __selectedMarkers: Set<CircleMarker> = new Set();
@@ -43,17 +31,15 @@ export abstract class MapLayerBase implements IMapLayer{
     protected __isVisible: boolean = true;
     protected __isActive: boolean = false;
 
+    readonly chunkColName: string;
     readonly layerName: string;
     abstract readonly typeNamePrefix: string;
 
-    protected constructor(map: LMap, name: string, csvHeader: string[]) {
+    protected constructor(map: LMap, name: string, csvHeader: string[], chunkColName: string) {
         this.__map = map;
-        this.layerName = name;
         this.__csvHeader = csvHeader;
-    }
-
-    get fullTitle(): string {
-        return `${this.typeNamePrefix}: ${this.layerName}`;
+        this.layerName = name;
+        this.chunkColName = chunkColName;
     }
 
     get isVisible(){
@@ -100,10 +86,6 @@ export abstract class MapLayerBase implements IMapLayer{
         this.__features.remove();
         this.__selectedMarkers.clear();
         this.__markerToSourceMap.clear();
-    }
-
-    getDataHeader(): string[] {
-        return this.__csvHeader;
     }
 
     getSelectionData(): string[][] {

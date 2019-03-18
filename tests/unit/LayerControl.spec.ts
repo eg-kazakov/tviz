@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import LayerControl from '../../src/components/LayerControl.vue';
+import LayerControl from '../../src/components/SourceLayerControl.vue';
 
 describe('LayerControl.vue', () => {
     it('renders a layer control', () => {

@@ -1,11 +1,11 @@
 <template>
     <div class="tviz-app">
         <div class="control-panel">
-            <layer-control v-for="layer in layers"
+            <source-layer-control v-for="layer in layers"
                 :key="layer.name"
                 :mapLayer="layer"
                 :active="layer === activeLayer"
-            ></layer-control>
+            ></source-layer-control>
             <input type="file"
                    @change="csvFileOpenedHandler"
                    :disabled="isInProgress"
@@ -30,18 +30,18 @@
     import {map as lMap, Map as Lmap, tileLayer} from 'leaflet';
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
-    import LayerControl from './components/LayerControl';
+    import SourceLayerControl from './components/SourceLayerControl';
     import CsvTableComponent from './components/CsvTableComponent';
-    import {IMapLayer} from './mapLayers/MapLayerBase';
     import {mapLayersFactory} from './mapLayers/mapLayersFactory';
     import {csvLoader} from './csvLoader';
+    import {SourceMapLayer} from './mapLayers/SourceMapLayer';
 
-    @Component ({components: {LayerControl, CsvTableComponent}})
+    @Component ({components: {SourceLayerControl, CsvTableComponent}})
     export default class App extends Vue {
         private __map!: Lmap;
         // ToDo: Use index or id???
-        activeLayer: IMapLayer|null = null;
-        layers: IMapLayer[] = [];
+        activeLayer: SourceMapLayer|null = null;
+        layers: SourceMapLayer[] = [];
         isInProgress: boolean = false;
 
         csvDialogData: string[][] = [];
@@ -61,10 +61,12 @@
             // ToDo: Rework to DI
             csvLoader.loadCsv(file)
                 // ToDo: Rework to DI
-                .then(csvResult => mapLayersFactory.createMapLayer(csvResult, file.name, this.__map))
+                .then(csvResult => mapLayersFactory.createMapLayer(csvResult, this.__map))
                 .then(newLayer => {
                     this.layers.unshift(newLayer);
                     this.activeLayer = newLayer;
+                    // ToDo: Find better solution
+                    this.activeLayer.isActive = true;
                     this.activeLayer.fitMap();
                 })
                 .catch(console.error)
@@ -82,8 +84,8 @@
         }
 
         mounted() {
-            this.$on('remove-layer', (layer: IMapLayer) => this.layers.splice(this.layers.indexOf(layer), 1));
-            this.$on('set-active-layer', (layer: IMapLayer) => this.activeLayer = layer);
+            this.$on('remove-layer', (layer: SourceMapLayer) => this.layers.splice(this.layers.indexOf(layer), 1));
+            this.$on('set-active-layer', (layer: SourceMapLayer) => this.activeLayer = layer);
 
             this.__map = lMap(<HTMLElement>this.$el.querySelector('.map-panel')).setView([51.505, -0.09], 13);
             tileLayer(
