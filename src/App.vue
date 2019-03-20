@@ -124,6 +124,8 @@
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
         z-index: 500;
         background-color: #f2f2f2;
+        width: 20vw;
+        min-width: 200px;
     }
 
     .tviz-app > .map-panel {
