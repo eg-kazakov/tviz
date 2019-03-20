@@ -32,19 +32,27 @@ function parseSegments(csvData: Array<{[key: string]: string}>
 }
 
 function createMapLayer(csvResult: ICsvData, map: LMap): SourceMapLayer {
-    const inputColsSet = new Set(csvResult.fields);
+    //ToDo: Rework columns detection solution
+    const inputColsDict: Map<string, string> = csvResult.fields.reduce((dict, fld) => {
+        dict.set(fld.trim(), fld);
+        return dict;
+    }, new Map());
 
     const latitudeColNames = ['lat', 'latitude', 'snap_lat'];
-    const latitudeColName = latitudeColNames.find(latName => inputColsSet.has(latName)) || null;
+    const latitudeNormColName = latitudeColNames.find(latName => inputColsDict.has(latName)) || null;
+    const latitudeColName = latitudeNormColName ? inputColsDict.get(latitudeNormColName) : null;
 
     const longitudeColNames = ['lng', 'lon', 'long', 'longitude', 'snap_lon'];
-    const longitudeColName = longitudeColNames.find(lngName => inputColsSet.has(lngName)) || null;
+    const longitudeNormColName = longitudeColNames.find(lngName => inputColsDict.has(lngName)) || null;
+    const longitudeColName = longitudeNormColName ? inputColsDict.get(longitudeNormColName) : null;
 
     const segmentColNames = ['segment_id'];
-    const segmentColName = segmentColNames.find(segName => inputColsSet.has(segName)) || null;
+    const segmentNormColName = segmentColNames.find(segName => inputColsDict.has(segName)) || null;
+    const segmentColName = segmentNormColName ? inputColsDict.get(segmentNormColName) : null;
 
     const chunkColNames = ['trip_id', 'trajectory_id', 'probe', 'probe_id'];
-    const chunkColName = chunkColNames.find(chunkName => inputColsSet.has(chunkName)) || null;
+    const chunkNormColName = chunkColNames.find(chunkName => inputColsDict.has(chunkName)) || null;
+    const chunkColName = chunkNormColName ? inputColsDict.get(chunkNormColName) : null;
 
     if (!latitudeColName || !longitudeColName) {
         throw new Error(`Unsupported format: ${csvResult.fields.join(', ')}`);
