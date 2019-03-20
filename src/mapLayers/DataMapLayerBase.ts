@@ -69,7 +69,7 @@ export abstract class DataMapLayerBase {
         } else {
             this.__features.bringToBack();
             this.__features.setStyle({opacity: opacityInActive, fillOpacity: opacityInActive});
-            this.__selectedMarkers.forEach(m => this.__makeMarkerUnSelected(m));
+            this.resetSelection();
         }
 
         this.__isActive = isActive;
@@ -102,7 +102,11 @@ export abstract class DataMapLayerBase {
         return result;
     }
 
-    __toggleMarkerSelected(marker: CircleMarker) {
+    resetSelection() {
+        this.__selectedMarkers.forEach(mrk => this.__makeMarkerUnSelected(mrk));
+    }
+
+    protected __toggleMarkerSelected(marker: CircleMarker) {
         if (!this.__selectedMarkers.has(marker)) {
             this.__makeMarkerSelected(marker);
         } else {
@@ -110,14 +114,14 @@ export abstract class DataMapLayerBase {
         }
     }
 
-    __makeMarkerSelected(marker: CircleMarker) {
+    private __makeMarkerSelected(marker: CircleMarker) {
         if (!this.__isActive) return;
 
         marker.setRadius(marker.getRadius() * 2);
         this.__selectedMarkers.add(marker);
     }
 
-    __makeMarkerUnSelected(marker: CircleMarker) {
+    private __makeMarkerUnSelected(marker: CircleMarker) {
         marker.setRadius(marker.getRadius() / 2);
         this.__selectedMarkers.delete(marker);
     }

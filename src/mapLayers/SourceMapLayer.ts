@@ -58,4 +58,8 @@ export class SourceMapLayer {
     getSelectionData(): string[][] {
         return this.subLayers.flatMap((layer: DataMapLayerBase) => layer.getSelectionData());
     }
+
+    resetSelection() {
+        this.subLayers.forEach(lr => lr.resetSelection());
+    }
 }

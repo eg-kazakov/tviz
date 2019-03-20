@@ -6,13 +6,20 @@
                 :map-layer="layer"
                 :active="layer === activeLayer"
             />
+            <fieldset style="font-size: 0.8rem">
+                <legend>Selected data</legend>
+                <button @click="showCsvRowsModal">
+                    Show
+                </button>
+                <button @click="resetSelectedCsvRows">
+                    Reset
+                </button>
+            </fieldset>
             <input type="file"
+                style="margin: 0.5rem 0.1rem"
                 :disabled="isInProgress"
                 @change="csvFileOpenedHandler"
             >
-            <button @click="showCsvRowsModal">
-                Show selected
-            </button>
         </div>
         <div class="map-panel"></div>
         <div v-if="isModalVisible"
@@ -87,6 +94,12 @@
             if (!this.activeLayer) return;
 
             this.csvDialogData = [this.activeLayer.getDataHeader(), ...this.activeLayer.getSelectionData()];
+        }
+
+        resetSelectedCsvRows() {
+            if (!this.activeLayer) return;
+
+            this.activeLayer.resetSelection();
         }
 
         hideModal() {
