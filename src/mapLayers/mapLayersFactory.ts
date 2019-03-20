@@ -34,10 +34,10 @@ function parseSegments(csvData: Array<{[key: string]: string}>
 function createMapLayer(csvResult: ICsvData, map: LMap): SourceMapLayer {
     const inputColsSet = new Set(csvResult.fields);
 
-    const latitudeColNames = ['lat', 'latitude'];
+    const latitudeColNames = ['lat', 'latitude', 'snap_lat'];
     const latitudeColName = latitudeColNames.find(latName => inputColsSet.has(latName)) || null;
 
-    const longitudeColNames = ['lng', 'lon', 'long', 'longitude'];
+    const longitudeColNames = ['lng', 'lon', 'long', 'longitude', 'snap_lon'];
     const longitudeColName = longitudeColNames.find(lngName => inputColsSet.has(lngName)) || null;
 
     const segmentColNames = ['segment_id'];

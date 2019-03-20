@@ -78,7 +78,7 @@
                 .catch(console.error)
                 .finally(() => {
                     // ToDo: check browser compatibility
-                    fileInput.value = null;
+                    fileInput.value = '';
                     this.isInProgress = false;
                 });
         }
