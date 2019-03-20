@@ -76,7 +76,11 @@
                     this.activeLayer.fitMap();
                 })
                 .catch(console.error)
-                .finally(() => (this.isInProgress = false));
+                .finally(() => {
+                    // ToDo: check browser compatibility
+                    fileInput.value = null;
+                    this.isInProgress = false;
+                });
         }
 
         showCsvRowsModal() {
