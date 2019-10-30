@@ -11,7 +11,7 @@
 
 //  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "parser": "typescript-eslint-parser",
+    "parser": "@typescript-eslint/parser",
     "ecmaVersion": 8,
     "source": "module"
   },
@@ -54,7 +54,7 @@
     "block-spacing": ["error", "never"],
     "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
     "callback-return": "error",
-    "camelcase": ["error", { "properties": "always" }],    
+    "camelcase": ["error", { "properties": "always" }],
     "capitalized-comments": "off",
     "class-methods-use-this": "error",
     "comma-dangle": ["error", {
@@ -343,7 +343,7 @@
     "radix": ["error","as-needed"],
     "require-jsdoc": "off",
     "require-await": "error",
-    "require-yield": "error",    
+    "require-yield": "error",
     "rest-spread-spacing": ["error", "never"],
     "semi": [2, "always"],
     "semi-spacing": ["error", { "before": false, "after": true }],
