@@ -40,7 +40,7 @@
 <script lang="ts">
     /* eslint-disable no-console */
 
-    import {map as lMap, Map as Lmap, tileLayer} from 'leaflet';
+    import {map as lMap, Map as LMap, tileLayer} from 'leaflet';
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
     import SourceLayerControl from './components/SourceLayerControl';
@@ -48,10 +48,11 @@
     import {mapLayersFactory} from './mapLayers/mapLayersFactory';
     import {csvLoader} from './csvLoader';
     import {SourceMapLayer} from './mapLayers/SourceMapLayer';
+    import * as PolylineMeasure from './Leaflet/PolylineMeasure/Leaflet.PolylineMeasure.js';
 
     @Component({components: {SourceLayerControl, CsvTableComponent}})
     export default class App extends Vue {
-        private __map!: Lmap;
+        private __map!: LMap;
         // ToDo: Use index or id???
         activeLayer: SourceMapLayer|null = null;
         layers: SourceMapLayer[] = [];
@@ -112,6 +113,15 @@
 
             // eslint-disable-next-line no-magic-numbers
             this.__map = lMap(this.$el.querySelector('.map-panel') as HTMLElement).setView([51.505, -0.09], 13);
+            const plMeasureCfg = {
+                position: 'topright',
+                unit: 'landmiles',
+                showBearings: true,
+                clearMeasurementsOnStop: false,
+                showClearControl: true,
+                showUnitControl: true
+            };
+            new PolylineMeasure(plMeasureCfg).addTo(this.__map);
             tileLayer(
                 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 {
@@ -124,6 +134,9 @@
 </script>
 
 <style>
+    @import './Leaflet/leaflet.css';
+    @import './Leaflet/PolylineMeasure/Leaflet.PolylineMeasure.css';
+
     .tviz-app {
         display: flex;
         flex-direction: row;
